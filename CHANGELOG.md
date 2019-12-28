@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   Bug when installing the library from NPM, and building a project after configuring this library would make the plugin to request missing files. The missing files have been added.
+
 ## [0.1.0] 2019-12-28
 
 ### Added
