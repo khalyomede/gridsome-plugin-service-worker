@@ -108,6 +108,8 @@ Serve the files locally, and navigate to the home page. Simulate a connection sh
 
 Reload your page: you should still see your home page, which means the service worker successfully fetched your resources from the cache as a fallback.
 
+Whenever you use your `CacheFirst` (for example), but you still need your files to be fetched again because you made a change on these files, you should change the name of the cache (using the `cacheName` option in `gridsome.config.js`) in order for the service worker to "update" the cache.
+
 Lastly (optional), configure your server (if your server architecture allow you to do so) to prevent the files `/service-worker.js` and `/assets/js/service-worker.js` to be cached by your server. Here is an example using Apache:
 
 ```htaccess
