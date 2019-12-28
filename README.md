@@ -2,6 +2,8 @@
 
 Registers a service worker and apply your file strategies to let you build a PWA.
 
+[![Build Status](https://travis-ci.com/khalyomede/gridsome-plugin-service-worker.svg?branch=master)](https://travis-ci.com/khalyomede/gridsome-plugin-service-worker) [![Maintainability](https://api.codeclimate.com/v1/badges/fcef734413cc4eca1f82/maintainability)](https://codeclimate.com/github/khalyomede/gridsome-plugin-service-worker/maintainability)
+
 ## Summary
 
 -   [About](#about)
