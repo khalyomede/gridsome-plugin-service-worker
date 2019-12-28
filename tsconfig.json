@@ -1,0 +1,12 @@
+{
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"strict": true,
+		"target": "ES2015",
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"importHelpers": true,
+		"module": "CommonJS",
+		"moduleResolution": "Node"
+	}
+}
