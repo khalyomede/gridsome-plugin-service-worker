@@ -27,6 +27,9 @@
 		"tslint": "5.*",
 		"typescript": "3.*"
 	},
+	"peerDependencies": {
+		"gridsome": "0.*"
+	},
 	"scripts": {
 		"build": "ncu && gulp build",
 		"test": "nyc --reporter=lcov mocha --require @babel/register test",
