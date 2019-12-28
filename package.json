@@ -38,7 +38,9 @@
 	},
 	"files": [
 		"gridsome.server.js",
-		"gridsome.client.js"
+		"gridsome.client.js",
+		"register-service-worker.js",
+		"service-worker.js"
 	],
 	"dependencies": {
 		"@babel/core": "7.*",
