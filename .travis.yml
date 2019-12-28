@@ -3,3 +3,5 @@ node_js:
     - "12"
 before_install:
     - npm install -g yarn
+after_success:
+    - yarn coverage
