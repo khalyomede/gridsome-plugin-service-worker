@@ -34,7 +34,8 @@
 		"coverage": "codecov"
 	},
 	"files": [
-		"gridsome.server.js"
+		"gridsome.server.js",
+		"gridsome.client.js"
 	],
 	"dependencies": {
 		"@babel/core": "7.*",
