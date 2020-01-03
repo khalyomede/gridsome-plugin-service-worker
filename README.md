@@ -13,7 +13,6 @@ Registers a service worker and apply your file strategies to let you build a PWA
 -   [Usage](#usage)
 -   [Changelog](CHANGELOG.md)
 -   [API](#api)
--   [Known issues](#known-issues)
 -   [Run the tests](#run-the-tests)
 
 ## About
@@ -154,33 +153,6 @@ interface Strategy {
 	routes: Array<String | RegExp>;
 }
 ```
-
-## Known issues
-
--   You need to take care to not capture the file `/assets/js/service-worker.js` if you capture Javascript assets in your Cache-Only or Cache-First strategy. If your configuration makes this file being captured for these strategies, you will end up not being able to serve an up-to-date service worker registration file in case it would change. **If it happens, you can still make sure to change the cache name**, but this is not wanted since it is a manual operation. Here is an example on how to capture all the javascripts files but this particular file using the Cache-First strategy configuration.
-
-```javascript
-module.exports = {
-	siteName: "Gridsome",
-	plugins: [
-		{
-			use: "gridsome-plugin-service-worker",
-			options: {
-				cacheFirst: {
-					cacheName: "cache-first-v1",
-					routes: [/^(?!\/assets\/js\/service-worker).*\.js$/],
-				},
-			},
-		},
-	],
-};
-```
-
-Which means
-
-> Take every files that ends with ".js", but not those that start with "/assets/js/service-worker"
-
-You can see how this regular expression is capturing the files but this particular file here : [https://regex101.com/r/9APDOr/1](https://regex101.com/r/9APDOr/1)
 
 ## Run the tests
 

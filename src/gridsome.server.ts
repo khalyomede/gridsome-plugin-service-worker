@@ -66,7 +66,20 @@ class GridsomePluginServiceWorker {
 				for (const route of options.staleWhileRevalidate.routes) {
 					const routeCode = generate(toAst(route));
 
-					code += `\nregisterRoute(${routeCode}, staleWhileRevalidate);`;
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						staleWhileRevalidate
+					);`;
 				}
 
 				serviceWorkerContent += code;
@@ -80,7 +93,20 @@ class GridsomePluginServiceWorker {
 				for (const route of options.networkOnly.routes) {
 					const routeCode = generate(toAst(route));
 
-					code += `\nregisterRoute(${routeCode}, networkOnly);`;
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						}, 
+						networkOnly
+					);`;
 				}
 
 				serviceWorkerContent += code;
@@ -95,9 +121,20 @@ class GridsomePluginServiceWorker {
 				for (const route of options.networkFirst.routes) {
 					const routeCode = generate(toAst(route));
 
-					code += `
-
-registerRoute(${routeCode}, networkFirst);`;
+					code += `registerRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						}, 
+						networkFirst
+					);`;
 				}
 
 				serviceWorkerContent += `${code}`;
@@ -111,7 +148,20 @@ registerRoute(${routeCode}, networkFirst);`;
 				for (const route of options.cacheOnly.routes) {
 					const routeCode = generate(toAst(route));
 
-					code += `\nregisterRoute(${routeCode}, cacheOnly);`;
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						}, 
+						cacheOnly
+					);`;
 				}
 
 				serviceWorkerContent += code;
@@ -126,8 +176,20 @@ const cacheFirst = new CacheFirst({
 				for (const route of options.cacheFirst.routes) {
 					const routeCode = generate(toAst(route));
 
-					code += `
-registerRoute(${routeCode}, cacheFirst);`;
+					code += `registerRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						}, 
+						cacheFirst
+					);`;
 				}
 
 				serviceWorkerContent += `${code}`;

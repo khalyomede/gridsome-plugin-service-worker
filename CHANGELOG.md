@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -   The service worker registration file was previously compiled each time you would build your project. Now it is compiled by default, and will be used compiled instead (which improved the speed of this plugin by aproximatively 25% in my computer).
+-   Previously, you could potentially catch the service worker registration file within one of your network strategies if you specified a regular expression to catch it (for example, using `/\.js$/` to catch all the Javascript files would also catch this service worker registration file). This could potentially be fatal if you used a cacheFirst strategy as this would mean this file could never change. Now, the generated service worker registration file (`/assets/js/service-worker.js`) will not be catched by any of your network strategies anymore.
 
 ## [0.1.1] 2019-12-28
 

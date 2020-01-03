@@ -208,7 +208,7 @@ var GridsomePluginServiceWorker = function () {
                 for (_i = 0, _a = options.staleWhileRevalidate.routes; _i < _a.length; _i++) {
                   route = _a[_i];
                   routeCode = escodegen_1.generate(toAst(route));
-                  code += "\nregisterRoute(" + routeCode + ", staleWhileRevalidate);";
+                  code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tstaleWhileRevalidate\n\t\t\t\t\t);";
                 }
 
                 serviceWorkerContent += code;
@@ -220,7 +220,7 @@ var GridsomePluginServiceWorker = function () {
                 for (_b = 0, _c = options.networkOnly.routes; _b < _c.length; _b++) {
                   route = _c[_b];
                   routeCode = escodegen_1.generate(toAst(route));
-                  code += "\nregisterRoute(" + routeCode + ", networkOnly);";
+                  code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}, \n\t\t\t\t\t\tnetworkOnly\n\t\t\t\t\t);";
                 }
 
                 serviceWorkerContent += code;
@@ -232,7 +232,7 @@ var GridsomePluginServiceWorker = function () {
                 for (_d = 0, _e = options.networkFirst.routes; _d < _e.length; _d++) {
                   route = _e[_d];
                   routeCode = escodegen_1.generate(toAst(route));
-                  code += "\n\nregisterRoute(" + routeCode + ", networkFirst);";
+                  code += "registerRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}, \n\t\t\t\t\t\tnetworkFirst\n\t\t\t\t\t);";
                 }
 
                 serviceWorkerContent += "" + code;
@@ -244,7 +244,7 @@ var GridsomePluginServiceWorker = function () {
                 for (_f = 0, _g = options.cacheOnly.routes; _f < _g.length; _f++) {
                   route = _g[_f];
                   routeCode = escodegen_1.generate(toAst(route));
-                  code += "\nregisterRoute(" + routeCode + ", cacheOnly);";
+                  code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}, \n\t\t\t\t\t\tcacheOnly\n\t\t\t\t\t);";
                 }
 
                 serviceWorkerContent += code;
@@ -256,7 +256,7 @@ var GridsomePluginServiceWorker = function () {
                 for (_h = 0, _j = options.cacheFirst.routes; _h < _j.length; _h++) {
                   route = _j[_h];
                   routeCode = escodegen_1.generate(toAst(route));
-                  code += "\nregisterRoute(" + routeCode + ", cacheFirst);";
+                  code += "registerRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}, \n\t\t\t\t\t\tcacheFirst\n\t\t\t\t\t);";
                 }
 
                 serviceWorkerContent += "" + code;
