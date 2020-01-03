@@ -169,7 +169,7 @@ var GridsomePluginServiceWorker = function () {
 
     api.beforeBuild(function () {
       return __awaiter(_this, void 0, void 0, function () {
-        var strategy, error, registerServiceWorkerBundle, serviceWorkerContent, routesCode, code, code, _i, _a, route, routeCode, code, _b, _c, route, routeCode, code, _d, _e, route, routeCode, code, _f, _g, route, routeCode, code, _h, _j, route, routeCode, serviceWorkerBundle;
+        var strategy, error, serviceWorkerContent, routesCode, code, code, _i, _a, route, routeCode, code, _b, _c, route, routeCode, code, _d, _e, route, routeCode, code, _f, _g, route, routeCode, code, _h, _j, route, routeCode, serviceWorkerBundle;
 
         return __generator(this, function (_k) {
           switch (_k.label) {
@@ -193,23 +193,6 @@ var GridsomePluginServiceWorker = function () {
                 console.timeEnd("gridsome-plugin-service-worker");
                 return [2];
               }
-
-              return [4, rollup_1.rollup({
-                input: __dirname + "/register-service-worker.js",
-                plugins: [nodeResolve(), commonjs(), babel({
-                  presets: ["@babel/preset-env"]
-                }), rollup_plugin_terser_1.terser()]
-              })];
-
-            case 1:
-              registerServiceWorkerBundle = _k.sent();
-              return [4, registerServiceWorkerBundle.write({
-                format: "iife",
-                file: "./static/assets/js/service-worker.js"
-              })];
-
-            case 2:
-              _k.sent();
 
               serviceWorkerContent = fs_1.readFileSync(__dirname + "/service-worker.js").toString();
 
@@ -290,14 +273,14 @@ var GridsomePluginServiceWorker = function () {
                 }), rollup_plugin_terser_1.terser()]
               })];
 
-            case 3:
+            case 1:
               serviceWorkerBundle = _k.sent();
               return [4, serviceWorkerBundle.write({
                 format: "iife",
                 file: "./static/service-worker.js"
               })];
 
-            case 4:
+            case 2:
               _k.sent();
 
               fs_1.unlinkSync("./static/service-worker.temp.js");

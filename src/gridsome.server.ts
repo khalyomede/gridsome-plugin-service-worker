@@ -47,23 +47,6 @@ class GridsomePluginServiceWorker {
 				return;
 			}
 
-			const registerServiceWorkerBundle = await rollup({
-				input: `${__dirname}/register-service-worker.js`,
-				plugins: [
-					nodeResolve(),
-					commonjs(),
-					babel({
-						presets: ["@babel/preset-env"],
-					}),
-					terser(),
-				],
-			});
-
-			await registerServiceWorkerBundle.write({
-				format: "iife",
-				file: "./static/assets/js/service-worker.js",
-			});
-
 			let serviceWorkerContent = readFileSync(
 				`${__dirname}/service-worker.js`
 			).toString();

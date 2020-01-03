@@ -5,7 +5,7 @@ import babel from "gulp-babel";
 import tslint from "gulp-tslint";
 
 const js = () =>
-	src("src/gridsome.{server,client}.ts")
+	src(["src/gridsome.{server,client}.ts", "src/register-service-worker.ts"])
 		.pipe(plumber())
 		.pipe(tslint())
 		.pipe(typescript())

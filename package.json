@@ -13,6 +13,7 @@
 		"@types/glob-to-regexp": "0.*",
 		"@types/hapi__joi": "16.*",
 		"@types/mkdirp": "0.*",
+		"@types/workbox-window": "4.*",
 		"chai": "4.*",
 		"codecov": "3.*",
 		"gulp": "4.*",

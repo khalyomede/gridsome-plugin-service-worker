@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   The service worker registration file was previously compiled each time you would build your project. Now it is compiled by default, and will be used compiled instead (which improved the speed of this plugin by aproximatively 25% in my computer).
+
 ## [0.1.1] 2019-12-28
 
 ### Fixed
