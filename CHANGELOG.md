@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] 2020-01-05
+
 ### Fixed
 
 -   Bug when new installations would see their service worker not working because the service worker registration file would not have been copied to the static folder.
