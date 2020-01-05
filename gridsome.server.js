@@ -155,6 +155,8 @@ var escodegen_1 = require("escodegen");
 
 var fs_1 = require("fs");
 
+var fs_extra_1 = require("fs-extra");
+
 var rollup_1 = require("rollup");
 
 var babel = require("rollup-plugin-babel");
@@ -284,6 +286,7 @@ var GridsomePluginServiceWorker = function () {
               _k.sent();
 
               fs_1.unlinkSync("./static/service-worker.temp.js");
+              fs_extra_1.copySync(__dirname + "/register-service-worker.js", "./static/assets/js/service-worker.js");
               console.timeEnd("gridsome-plugin-service-worker");
               return [2];
           }

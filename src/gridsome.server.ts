@@ -4,6 +4,7 @@ import * as nodeResolve from "@rollup/plugin-node-resolve";
 import * as replace from "@rollup/plugin-replace";
 import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
+import { copySync } from "fs-extra";
 import { rollup } from "rollup";
 import * as babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
@@ -222,6 +223,8 @@ const cacheFirst = new CacheFirst({
 			});
 
 			unlinkSync("./static/service-worker.temp.js");
+
+			copySync(`${__dirname}/register-service-worker.js`, "./static/assets/js/service-worker.js");
 
 			/* tslint:disable:no-console */
 			console.timeEnd("gridsome-plugin-service-worker");
