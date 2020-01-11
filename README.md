@@ -11,6 +11,7 @@ Registers a service worker and apply your file strategies to let you build a PWA
 -   [Requirements](#requirements)
 -   [Installation](#installation)
 -   [Usage](#usage)
+-   [Examples](#examples)
 -   [Changelog](CHANGELOG.md)
 -   [API](#api)
 -   [Run the tests](#run-the-tests)
@@ -134,6 +135,50 @@ Lastly (optional), configure your server (if your server architecture allow you 
 ```
 
 The [browsers now are configured to check every 24h at most for service worker changes](https://stackoverflow.com/questions/38843970/service-worker-javascript-update-frequency-every-24-hours/38854905#38854905), but this operations make sure the browser will not try to cache these files anyway.
+
+## Examples
+
+-   [1. Use a Network-First strategy](#1-use-a-network-first-strategy)
+-   [2. Cache resources ahead of time for offline browsing](#2-cache-resources-ahead-of-time-for-offline-browsing)
+
+### 1. Use a Network-First strategy
+
+```javascript
+// gridsome.config.js
+module.exports = {
+	plugins: [
+		{
+			use: "gridsome-plugin-service-worker",
+			options: {
+				networkFirst: {
+					cacheName: "nf-v1",
+					routes: ["/", /\.(js|css|png)/],
+				},
+			},
+		},
+	],
+};
+```
+
+### 2. Cache resources ahead of time for offline browsing
+
+```javascript
+// gridsome.config.js
+module.exports = {
+	plugins: [
+		{
+			use: "gridsome-plugin-service-worker",
+			options: {
+				precachedRoutes: ["/"],
+				cacheOnly: {
+					cacheName: "co-v1",
+					routes: ["/"],
+				},
+			},
+		},
+	],
+};
+```
 
 ## API
 
