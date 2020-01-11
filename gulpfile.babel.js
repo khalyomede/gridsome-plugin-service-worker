@@ -10,7 +10,7 @@ import rollupTypescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 
 const js = () =>
-	src(["src/gridsome.{server,client}.ts"])
+	src("src/gridsome.{client,server}.ts")
 		.pipe(plumber())
 		.pipe(tslint())
 		.pipe(typescript())
