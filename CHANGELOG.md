@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] 2020-01-11
+
 ### Fixed
 
 - Bug when a dependency that was used to validate the option was generating an error when building the project on Netlify.
