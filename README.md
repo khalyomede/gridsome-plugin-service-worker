@@ -6,15 +6,15 @@ Registers a service worker and apply your file strategies to let you build a PWA
 
 ## Summary
 
--   [About](#about)
--   [Features](#features)
--   [Requirements](#requirements)
--   [Installation](#installation)
--   [Usage](#usage)
--   [Examples](#examples)
--   [Changelog](CHANGELOG.md)
--   [API](#api)
--   [Run the tests](#run-the-tests)
+- [About](#about)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Changelog](CHANGELOG.md)
+- [API](#api)
+- [Run the tests](#run-the-tests)
 
 ## About
 
@@ -24,19 +24,19 @@ I wanted to have a drop-in way to tell which routes to capture and for each, to 
 
 ## Features
 
--   Generates the script that registers your service worker and the script that defines the service worker
--   Adds the necessary scripts to the head of each of your HTML files at build time
--   Let you choose how your routes should be fetched on the network among
-    -   Network-first
-    -   Network-only
-    -   Cache-first
-    -   Cache-only
-    -   Stale while revalidate
--   Let you choose which route to cache ahead, a.k.a. precaching (very powerful with Cache-only)
+- Generates the script that registers your service worker and the script that defines the service worker
+- Adds the necessary scripts to the head of each of your HTML files at build time
+- Let you choose how your routes should be fetched on the network among
+  - Network-first
+  - Network-only
+  - Cache-first
+  - Cache-only
+  - Stale while revalidate
+- Let you choose which route to cache ahead, a.k.a. precaching (very powerful with Cache-only)
 
 ## Requirements
 
--   NPM or Yarn installed on your machine
+- NPM or Yarn installed on your machine
 
 ## Installation
 
@@ -60,12 +60,12 @@ Add the plugin to the list of your plugins in the file `gridsome.config.js`
 
 ```javascript
 module.exports = {
-	siteName: "Gridsome",
-	plugins: [
-		{
-			use: "gridsome-plugin-service-worker",
-		},
-	],
+  siteName: "Gridsome",
+  plugins: [
+    {
+      use: "gridsome-plugin-service-worker",
+    },
+  ],
 };
 ```
 
@@ -73,20 +73,20 @@ Add a first network strategy, which will serve as an example that you will be ab
 
 ```javascript
 module.exports = {
-	siteName: "Gridsome",
-	plugins: [
-		{
-			use: "gridsome-plugin-service-worker",
-			options: {
-				networkFirst: {
-					routes: [
-						"/",
-						/\.(js|css|png)$/, // means "every JS, CSS, and PNG images"
-					],
-				},
-			},
-		},
-	],
+  siteName: "Gridsome",
+  plugins: [
+    {
+      use: "gridsome-plugin-service-worker",
+      options: {
+        networkFirst: {
+          routes: [
+            "/",
+            /\.(js|css|png)$/, // means "every JS, CSS, and PNG images"
+          ],
+        },
+      },
+    },
+  ],
 };
 ```
 
@@ -138,25 +138,25 @@ The [browsers now are configured to check every 24h at most for service worker c
 
 ## Examples
 
--   [1. Use a Network-First strategy](#1-use-a-network-first-strategy)
--   [2. Cache resources ahead of time for offline browsing](#2-cache-resources-ahead-of-time-for-offline-browsing)
+- [1. Use a Network-First strategy](#1-use-a-network-first-strategy)
+- [2. Cache resources ahead of time for offline browsing](#2-cache-resources-ahead-of-time-for-offline-browsing)
 
 ### 1. Use a Network-First strategy
 
 ```javascript
 // gridsome.config.js
 module.exports = {
-	plugins: [
-		{
-			use: "gridsome-plugin-service-worker",
-			options: {
-				networkFirst: {
-					cacheName: "nf-v1",
-					routes: ["/", /\.(js|css|png)/],
-				},
-			},
-		},
-	],
+  plugins: [
+    {
+      use: "gridsome-plugin-service-worker",
+      options: {
+        networkFirst: {
+          cacheName: "nf-v1",
+          routes: ["/", /\.(js|css|png)/],
+        },
+      },
+    },
+  ],
 };
 ```
 
@@ -165,18 +165,18 @@ module.exports = {
 ```javascript
 // gridsome.config.js
 module.exports = {
-	plugins: [
-		{
-			use: "gridsome-plugin-service-worker",
-			options: {
-				precachedRoutes: ["/"],
-				cacheOnly: {
-					cacheName: "co-v1",
-					routes: ["/"],
-				},
-			},
-		},
-	],
+  plugins: [
+    {
+      use: "gridsome-plugin-service-worker",
+      options: {
+        precachedRoutes: ["/"],
+        cacheOnly: {
+          cacheName: "co-v1",
+          routes: ["/"],
+        },
+      },
+    },
+  ],
 };
 ```
 
@@ -184,18 +184,18 @@ module.exports = {
 
 _You will find the prototype of the `Strategy` type below._
 
--   options
-    -   **cacheFirst**: `Strategy`: Every time the browser requests these routes, if it is in the browser's cache, it will be used instead of fetching it from the network (even if the network is up). If it is not in the network, fetches it from the network, plus add it on the browser's cache. Used for low-priority resources that do not change often, or do not need to display an up-to-date response, like pictures. [Workbox's Cache-first documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_first_cache_falling_back_to_network)
-    -   **cacheOnly**: `Strategy` Every time the browser requests these routes, if they are in the browser's cache, they will be fetched from the cache. If they are not in the cache, they will return no response. Note that this strategy works very well when you precache files using the `precachedRoutes` options. [Workbox's Cache-only documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_only)
-    -   **networkFirst**: `Strategy`: Every time the browser requests these routes, they will be cached in the browser's cache. If the network is down, tries to fetch the request from the cache (if the resource have been cached). Used when you always need to present the most up-to-date resources to the user, and you also want to be able to display offline content as a fallback. [Workbox's Network-first documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache)
-    -   **networkOnly**: `Strategy`: This corresponds to the default behavior, like if you would not have used any strategy for your routes. [Workbox's Network-only documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_only)
-    -   **precachedRoutes**: `Array<String>` A list of routes to cache ahead (right after the service worker is installed). This is very powerful to use with the `cacheOnly` option since you will be able to create Offline-ready apps without the user to browser the desired resources to cache. [Workbox's precaching documentation](https://developers.google.com/web/tools/workbox/modules/workbox-precaching#what_is_precaching)
-    -   **staleWhileRevalidate**: `Strategy` Every time the browser requests these routes, if they are in the cache, they are returned from the cache to the browser, plus the service worker will still try to fetch the response from the network in the background and put this response in the cache. Used when the resource needs to be served the fastest possible, and when it is not a problem if the resource is not up-to-date when requested, like fonts, videos, static pages that do not display critical content, ... [Workbox's Stale while revalidate documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#stale-while-revalidate)
+- options
+  - **cacheFirst**: `Strategy`: Every time the browser requests these routes, if it is in the browser's cache, it will be used instead of fetching it from the network (even if the network is up). If it is not in the network, fetches it from the network, plus add it on the browser's cache. Used for low-priority resources that do not change often, or do not need to display an up-to-date response, like pictures. [Workbox's Cache-first documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_first_cache_falling_back_to_network)
+  - **cacheOnly**: `Strategy` Every time the browser requests these routes, if they are in the browser's cache, they will be fetched from the cache. If they are not in the cache, they will return no response. Note that this strategy works very well when you precache files using the `precachedRoutes` options. [Workbox's Cache-only documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_only)
+  - **networkFirst**: `Strategy`: Every time the browser requests these routes, they will be cached in the browser's cache. If the network is down, tries to fetch the request from the cache (if the resource have been cached). Used when you always need to present the most up-to-date resources to the user, and you also want to be able to display offline content as a fallback. [Workbox's Network-first documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache)
+  - **networkOnly**: `Strategy`: This corresponds to the default behavior, like if you would not have used any strategy for your routes. [Workbox's Network-only documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_only)
+  - **precachedRoutes**: `Array<String>` A list of routes to cache ahead (right after the service worker is installed). This is very powerful to use with the `cacheOnly` option since you will be able to create Offline-ready apps without the user to browser the desired resources to cache. [Workbox's precaching documentation](https://developers.google.com/web/tools/workbox/modules/workbox-precaching#what_is_precaching)
+  - **staleWhileRevalidate**: `Strategy` Every time the browser requests these routes, if they are in the cache, they are returned from the cache to the browser, plus the service worker will still try to fetch the response from the network in the background and put this response in the cache. Used when the resource needs to be served the fastest possible, and when it is not a problem if the resource is not up-to-date when requested, like fonts, videos, static pages that do not display critical content, ... [Workbox's Stale while revalidate documentation](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#stale-while-revalidate)
 
 ```typescript
 interface Strategy {
-	cacheName: string;
-	routes: Array<String | RegExp>;
+  cacheName: string;
+  routes: Array<String | RegExp>;
 }
 ```
 
@@ -204,9 +204,9 @@ interface Strategy {
 1. Clone the project: `git clone https://github.com/khalyomede/gridsome-plugin-service-worker.git`
 2. Install the dependencies
 
-    - With NPM: `npm install`
-    - With Yarn: `yarn install`
+   - With NPM: `npm install`
+   - With Yarn: `yarn install`
 
 3. Run the tests
-    - With NPM: `npm run test`
-    - With Yarn: `yarn test`
+   - With NPM: `npm run test`
+   - With Yarn: `yarn test`
