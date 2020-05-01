@@ -5,8 +5,12 @@ import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { copy } from "fs-extra";
 import { rollup } from "rollup";
+// @ts-ignore
+// Ignoring because there is no type package for it.
 import * as babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
+// @ts-ignore
+// Ignoring because there is no type package for it.
 import * as toAst from "to-ast";
 import IApi from "./IApi";
 import IOptions from "./IOptions";
@@ -284,13 +288,25 @@ class GridsomePluginServiceWorker {
 		const serviceWorkerBundle = await rollup({
 			input: "./static/service-worker.temp.js",
 			plugins: [
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
 				nodeResolve(),
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
 				commonjs(),
 				babel({
 					exclude: "node_modules/**",
 					presets: ["@babel/preset-env"],
 					runtimeHelpers: true,
 				}),
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
 				replace({
 					"process.env.NODE_ENV": JSON.stringify("production"),
 				}),
@@ -315,38 +331,43 @@ class GridsomePluginServiceWorker {
 		);
 	}
 
-	private _throwIfOptionIsNotAStrategy(optionName: string): void {
+	private _throwIfOptionIsNotAStrategy(
+		optionName:
+			| "cacheFirst"
+			| "networkFirst"
+			| "cacheOnly"
+			| "networkOnly"
+			| "staleWhileRevalidate"
+	): void {
 		if (optionName in this._options) {
-			if (!(this._options[optionName] instanceof Object)) {
+			const strategy = this._options[optionName];
+
+			if (!(strategy instanceof Object)) {
 				throw new TypeError(`"${optionName}" must be an object`);
 			}
 
-			if (!("cacheName" in this._options[optionName])) {
+			if (!("cacheName" in strategy)) {
 				throw new TypeError(
 					`"${optionName}.cacheName" must be present`
 				);
 			}
 
-			if (!("routes" in this._options[optionName])) {
+			if (!("routes" in strategy)) {
 				throw new TypeError(`"${optionName}.routes" must be present`);
 			}
 
-			if (typeof this._options[optionName].cacheName !== "string") {
+			if (typeof strategy.cacheName !== "string") {
 				throw new TypeError(
 					`"${optionName}.cacheName" must be a string`
 				);
 			}
 
-			if (!Array.isArray(this._options[optionName].routes)) {
+			if (!Array.isArray(strategy.routes)) {
 				throw new TypeError(`"${optionName}.routes" must be an array`);
 			}
 
-			for (
-				let index = 0;
-				index < this._options[optionName].routes.length;
-				index++
-			) {
-				const route = this._options[optionName].routes[index];
+			for (let index = 0; index < strategy.routes.length; index++) {
+				const route = strategy.routes[index];
 
 				if (typeof route !== "string" && !(route instanceof RegExp)) {
 					throw new TypeError(

@@ -382,28 +382,30 @@ var GridsomePluginServiceWorker = function () {
 
   GridsomePluginServiceWorker.prototype._throwIfOptionIsNotAStrategy = function (optionName) {
     if (optionName in this._options) {
-      if (!(this._options[optionName] instanceof Object)) {
+      var strategy = this._options[optionName];
+
+      if (!(strategy instanceof Object)) {
         throw new TypeError("\"" + optionName + "\" must be an object");
       }
 
-      if (!("cacheName" in this._options[optionName])) {
+      if (!("cacheName" in strategy)) {
         throw new TypeError("\"" + optionName + ".cacheName\" must be present");
       }
 
-      if (!("routes" in this._options[optionName])) {
+      if (!("routes" in strategy)) {
         throw new TypeError("\"" + optionName + ".routes\" must be present");
       }
 
-      if (typeof this._options[optionName].cacheName !== "string") {
+      if (typeof strategy.cacheName !== "string") {
         throw new TypeError("\"" + optionName + ".cacheName\" must be a string");
       }
 
-      if (!Array.isArray(this._options[optionName].routes)) {
+      if (!Array.isArray(strategy.routes)) {
         throw new TypeError("\"" + optionName + ".routes\" must be an array");
       }
 
-      for (var index = 0; index < this._options[optionName].routes.length; index++) {
-        var route = this._options[optionName].routes[index];
+      for (var index = 0; index < strategy.routes.length; index++) {
+        var route = strategy.routes[index];
 
         if (typeof route !== "string" && !(route instanceof RegExp)) {
           throw new TypeError("\"" + optionName + ".routes[" + index + "]\" must be a string or a regexp");
