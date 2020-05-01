@@ -13,18 +13,13 @@ const api = {
 	},
 };
 
-beforeEach(function() {
+beforeEach(function () {
 	this.sinon.stub(console, "error");
 	this.sinon.stub(console, "log");
 });
 
-before(done => mkdir("static", done));
-after(() => {
-	unlinkSync("static/assets/js/service-worker.js");
-	unlinkSync("static/service-worker.js");
-	rmdirSync("static/assets/js");
-	rmdirSync("static/assets");
-	rmdirSync("static");
+before(done => {
+	mkdir("static", done);
 });
 
 describe("server", () => {
@@ -32,8 +27,8 @@ describe("server", () => {
 		it("should export a function", () =>
 			expect(GridsomeServer).to.be.an.instanceOf(Function));
 
-		it("should generate a service-worker.js file in the static folder", async function() {
-			this.timeout(5000);
+		it("should generate a service-worker.js file in the static folder", async function () {
+			this.timeout(10000);
 
 			new GridsomeServer(api, {
 				networkFirst: {
@@ -42,7 +37,7 @@ describe("server", () => {
 				},
 			});
 
-			await sleep(4000);
+			await sleep(9000);
 
 			expect(existsSync("static/service-worker.js")).to.be.true;
 			expect(existsSync("static/assets/js/service-worker.js")).to.be.true;
