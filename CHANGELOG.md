@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.5] 2020-05-01
 
+### Added
+
+- Supporting more browsers (95% coverage at this time).
+
 ### Fixed
 
 - Out of date dependencies.
