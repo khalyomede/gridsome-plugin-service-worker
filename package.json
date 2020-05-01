@@ -21,13 +21,13 @@
 		"gulp-typescript": "5.*",
 		"mocha": "7.*",
 		"mocha-sinon": "2.*",
-		"np": "5.*",
+		"np": "6.*",
 		"npm-check-updates": "4.*",
 		"nyc": "15.*",
 		"rollup-plugin-tslint": "0.*",
-		"sinon": "8.*",
+		"sinon": "9.*",
 		"tslib": "1.*",
-		"tslint": "5.*",
+		"tslint": "6.*",
 		"typescript": "3.*"
 	},
 	"peerDependencies": {
@@ -37,7 +37,8 @@
 		"build": "ncu && gulp build",
 		"test": "nyc --reporter=text --reporter=lcov mocha --require @babel/register test",
 		"release": "np",
-		"coverage": "codecov"
+		"coverage": "codecov",
+		"rollup": "rollup"
 	},
 	"files": [
 		"gridsome.server.js",
@@ -55,16 +56,16 @@
 		"@rollup/plugin-node-resolve": "7.*",
 		"@rollup/plugin-replace": "2.*",
 		"escodegen": "1.*",
-		"fs-extra": "8.*",
-		"rollup": "1.*",
+		"fs-extra": "9.*",
+		"rollup": "2.*",
 		"rollup-plugin-babel": "4.*",
 		"rollup-plugin-terser": "5.*",
 		"to-ast": "1.*",
-		"workbox-core": "4.*",
-		"workbox-precaching": "4.*",
-		"workbox-routing": "4.*",
-		"workbox-strategies": "4.*",
-		"workbox-window": "4.*"
+		"workbox-core": "5.*",
+		"workbox-precaching": "5.*",
+		"workbox-routing": "5.*",
+		"workbox-strategies": "5.*",
+		"workbox-window": "5.*"
 	},
 	"keywords": [
 		"gridsome-plugin",
