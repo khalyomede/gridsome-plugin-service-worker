@@ -1,6 +1,6 @@
 {
 	"name": "gridsome-plugin-service-worker",
-	"version": "0.1.5",
+	"version": "0.2.0",
 	"description": "Registers a service worker and apply your file strategies to let you build a PWA.",
 	"main": "gridsome.server.js",
 	"repository": "https://github.com/khalyomede/gridsome-plugin-service-worker",
