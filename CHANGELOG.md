@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] 2020-08-16
+
+### Fixed
+
+- The service worker registration path will correctly use your `pathPrefix` from `gridsome.config.js`, instead of just for the scope.
+
 ## [0.2.2] 2020-08-16
 
 ### Fixed
