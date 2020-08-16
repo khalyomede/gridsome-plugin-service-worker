@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] 2020-08-17
+
+### Fixed
+
+- The service worker scope will be suffixed by a slash correctly when using pathPrefix gridsome.config.js option.
+
 ## [0.2.4] 2020-08-17
 
 ### Fixed

@@ -257,7 +257,8 @@ var GridsomePluginServiceWorker = function () {
     var _a, _b, _c;
 
     var pathPrefix = (_c = (_b = (_a = process === null || process === void 0 ? void 0 : process.GRIDSOME) === null || _a === void 0 ? void 0 : _a.config) === null || _b === void 0 ? void 0 : _b.pathPrefix) !== null && _c !== void 0 ? _c : "/";
-    var scope = escodegen_1.generate(toAst(pathPrefix));
+    var scope = pathPrefix.endsWith("/") ? pathPrefix : pathPrefix + "/";
+    scope = escodegen_1.generate(toAst(pathPrefix));
     var serviceWorkerPath = "/service-worker.js";
 
     if (pathPrefix) {
