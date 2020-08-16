@@ -258,7 +258,14 @@ var GridsomePluginServiceWorker = function () {
 
     var pathPrefix = (_c = (_b = (_a = process === null || process === void 0 ? void 0 : process.GRIDSOME) === null || _a === void 0 ? void 0 : _a.config) === null || _b === void 0 ? void 0 : _b.pathPrefix) !== null && _c !== void 0 ? _c : "/";
     var scope = escodegen_1.generate(toAst(pathPrefix));
-    this._serviceWorkerRegistrationContent = "\n\t\t\timport { Workbox } from \"workbox-window\";\n\n\t\t\tif (\"serviceWorker\" in navigator) {\n\t\t\t\tconst workbox = new Workbox(\"/service-worker.js\", {\n\t\t\t\t\tscope: " + scope + ",\n\t\t\t\t});\n\n\t\t\t\t(async () => await workbox.register())();\n\t\t\t}\n\t\t";
+    var serviceWorkerPath = "/service-worker.js";
+
+    if (pathPrefix) {
+      serviceWorkerPath = !pathPrefix.endsWith("/") ? pathPrefix + "/service-worker.js" : pathPrefix + "service-worker.js";
+    }
+
+    serviceWorkerPath = escodegen_1.generate(toAst(serviceWorkerPath));
+    this._serviceWorkerRegistrationContent = "\n\t\t\timport { Workbox } from \"workbox-window\";\n\n\t\t\tif (\"serviceWorker\" in navigator) {\n\t\t\t\tconst workbox = new Workbox(" + serviceWorkerPath + ", {\n\t\t\t\t\tscope: " + scope + ",\n\t\t\t\t});\n\n\t\t\t\t(async () => await workbox.register())();\n\t\t\t}\n\t\t";
   };
 
   GridsomePluginServiceWorker.prototype._saveTemporaryServiceWorkerRegistrationContent = function () {

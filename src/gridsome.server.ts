@@ -122,11 +122,21 @@ class GridsomePluginServiceWorker {
 		// Ignoring because it will be available when used in a project
 		const pathPrefix = process?.GRIDSOME?.config?.pathPrefix ?? "/";
 		const scope = generate(toAst(pathPrefix));
+		let serviceWorkerPath = "/service-worker.js";
+
+		if (pathPrefix) {
+			serviceWorkerPath = !pathPrefix.endsWith("/")
+				? `${pathPrefix}/service-worker.js`
+				: `${pathPrefix}service-worker.js`;
+		}
+
+		serviceWorkerPath = generate(toAst(serviceWorkerPath));
+
 		this._serviceWorkerRegistrationContent = `
 			import { Workbox } from "workbox-window";
 
 			if ("serviceWorker" in navigator) {
-				const workbox = new Workbox("/service-worker.js", {
+				const workbox = new Workbox(${serviceWorkerPath}, {
 					scope: ${scope},
 				});
 
