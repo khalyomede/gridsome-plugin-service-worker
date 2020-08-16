@@ -122,8 +122,10 @@ class GridsomePluginServiceWorker {
 		// @ts-ignore
 		// Ignoring because it will be available when used in a project
 		const pathPrefix = process?.GRIDSOME?.config?.pathPrefix ?? "/";
-		let scope = pathPrefix.endsWith("/") ? pathPrefix : `${pathPrefix}/`;
-		scope = generate(toAst(pathPrefix));
+		let scope = generate(toAst(pathPrefix));
+		if (!scope.endsWith("/'")) {
+			scope = scope.replace(/'$/, "/'");
+		}
 		let serviceWorkerPath = "/service-worker.js";
 
 		if (pathPrefix) {
