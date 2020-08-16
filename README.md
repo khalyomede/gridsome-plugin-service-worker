@@ -81,7 +81,7 @@ module.exports = {
       options: {
         networkFirst: {
           routes: ["/", "/about"],
-          fileTypes: ["image", "script", "style", "image"],
+          fileTypes: ["document", "script", "style", "image"],
         },
       },
     },
