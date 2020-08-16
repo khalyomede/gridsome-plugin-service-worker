@@ -70,7 +70,7 @@ describe("server", () => {
 				).to.be.true;
 			});
 
-			it("should throw an error if the routes key of the cacheFirst option is not present", () => {
+			it("should throw an error if the routes and fileTypes keys of the cacheFirst option is not present", () => {
 				new GridsomeServer(api, {
 					cacheFirst: {
 						cacheName: "cf-v1",
@@ -79,7 +79,7 @@ describe("server", () => {
 
 				expect(
 					console.error.calledWith(
-						`gridsome-plugin-service-worker: "cacheFirst.routes" must be present`
+						`gridsome-plugin-service-worker: "cacheFirst.routes" or "cacheFirst.fileTypes" must be present`
 					)
 				).to.be.true;
 			});
@@ -155,7 +155,7 @@ describe("server", () => {
 				).to.be.true;
 			});
 
-			it("should throw an error if the routes key of the cacheOnly option is not present", () => {
+			it("should throw an error if the routes and fileTypes keys of the cacheOnly option is not present", () => {
 				new GridsomeServer(api, {
 					cacheOnly: {
 						cacheName: "co-v1",
@@ -164,7 +164,7 @@ describe("server", () => {
 
 				expect(
 					console.error.calledWith(
-						`gridsome-plugin-service-worker: "cacheOnly.routes" must be present`
+						`gridsome-plugin-service-worker: "cacheOnly.routes" or "cacheOnly.fileTypes" must be present`
 					)
 				).to.be.true;
 			});
@@ -240,7 +240,7 @@ describe("server", () => {
 				).to.be.true;
 			});
 
-			it("should throw an error if the routes key of the networkFirst option is not present", () => {
+			it("should throw an error if the routes and fileTypes keys of the networkFirst option is not present", () => {
 				new GridsomeServer(api, {
 					networkFirst: {
 						cacheName: "nf-v1",
@@ -249,7 +249,7 @@ describe("server", () => {
 
 				expect(
 					console.error.calledWith(
-						`gridsome-plugin-service-worker: "networkFirst.routes" must be present`
+						`gridsome-plugin-service-worker: "networkFirst.routes" or "networkFirst.fileTypes" must be present`
 					)
 				).to.be.true;
 			});
@@ -325,7 +325,7 @@ describe("server", () => {
 				).to.be.true;
 			});
 
-			it("should throw an error if the routes key of the networkOnly option is not present", () => {
+			it("should throw an error if the routes and fileTypes keys of the networkOnly option is not present", () => {
 				new GridsomeServer(api, {
 					networkOnly: {
 						cacheName: "no-v1",
@@ -334,7 +334,7 @@ describe("server", () => {
 
 				expect(
 					console.error.calledWith(
-						`gridsome-plugin-service-worker: "networkOnly.routes" must be present`
+						`gridsome-plugin-service-worker: "networkOnly.routes" or "networkOnly.fileTypes" must be present`
 					)
 				).to.be.true;
 			});
@@ -410,7 +410,7 @@ describe("server", () => {
 				).to.be.true;
 			});
 
-			it("should throw an error if the routes key of the staleWhileRevalidate option is not present", () => {
+			it("should throw an error if the routes and fileTypes keys of the staleWhileRevalidate option is not present", () => {
 				new GridsomeServer(api, {
 					staleWhileRevalidate: {
 						cacheName: "swr-v1",
@@ -419,7 +419,7 @@ describe("server", () => {
 
 				expect(
 					console.error.calledWith(
-						`gridsome-plugin-service-worker: "staleWhileRevalidate.routes" must be present`
+						`gridsome-plugin-service-worker: "staleWhileRevalidate.routes" or "staleWhileRevalidate.fileTypes" must be present`
 					)
 				).to.be.true;
 			});

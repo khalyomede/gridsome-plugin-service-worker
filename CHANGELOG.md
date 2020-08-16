@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] 2020-08-16
+
+### Added
+
+- Support for caching files based on their type (html, scripts, styles, ...). Check the documentation for more information.
+
 ## [0.1.5] 2020-05-01
 
 ### Added

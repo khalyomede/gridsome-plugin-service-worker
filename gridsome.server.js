@@ -143,9 +143,11 @@ var __generator = void 0 && (void 0).__generator || function (thisArg, body) {
   }
 };
 
+var plugin_babel_1 = require("@rollup/plugin-babel");
+
 var commonjs = require("@rollup/plugin-commonjs");
 
-var nodeResolve = require("@rollup/plugin-node-resolve");
+var plugin_node_resolve_1 = require("@rollup/plugin-node-resolve");
 
 var replace = require("@rollup/plugin-replace");
 
@@ -157,8 +159,6 @@ var fs_extra_1 = require("fs-extra");
 
 var rollup_1 = require("rollup");
 
-var babel = require("rollup-plugin-babel");
-
 var rollup_plugin_terser_1 = require("rollup-plugin-terser");
 
 var toAst = require("to-ast");
@@ -167,6 +167,7 @@ var GridsomePluginServiceWorker = function () {
   function GridsomePluginServiceWorker(api, options) {
     var _this = this;
 
+    this.ALLOWED_REQUEST_DESTINATION = ["audio", "audioworklet", "document", "embed", "font", "image", "manifest", "object", "paintworklet", "report", "script", "serviceworker", "sharedworker", "style", "track", "video", "worker", "xslt"];
     this._options = options;
     this._serviceWorkerContent = "";
     api.beforeBuild(function () {
@@ -222,24 +223,29 @@ var GridsomePluginServiceWorker = function () {
     return {
       cacheFirst: {
         cacheName: "cf-v1",
-        routes: []
+        routes: [],
+        fileTypes: []
       },
       cacheOnly: {
         cacheName: "co-v1",
-        routes: []
+        routes: [],
+        fileTypes: []
       },
       networkFirst: {
         cacheName: "nf-v1",
-        routes: []
+        routes: [],
+        fileTypes: []
       },
       networkOnly: {
         cacheName: "no-v1",
-        routes: []
+        routes: [],
+        fileTypes: []
       },
       precachedRoutes: [],
       staleWhileRevalidate: {
         cacheName: "swr-v1",
-        routes: []
+        routes: [],
+        fileTypes: []
       }
     };
   };
@@ -257,13 +263,20 @@ var GridsomePluginServiceWorker = function () {
   };
 
   GridsomePluginServiceWorker.prototype._addCacheFirstToServiceWorkerContent = function () {
-    if ("cacheFirst" in this._options && this._options.cacheFirst instanceof Object && this._options.cacheFirst.routes.length > 0) {
+    if ("cacheFirst" in this._options && this._options.cacheFirst instanceof Object && (this._options.cacheFirst.routes.length > 0 || this._options.cacheFirst.fileTypes.length > 0)) {
       var code = "\n\t\t\tconst cacheFirst = new CacheFirst({\n\t\t\t\tcacheName: " + JSON.stringify(this._options.cacheFirst.cacheName) + "\n\t\t\t});";
 
-      for (var _i = 0, _a = this._options.cacheFirst.routes; _i < _a.length; _i++) {
-        var route = _a[_i];
-        var routeCode = escodegen_1.generate(toAst(route));
-        code += "registerRoute(\n\t\t\t\t\t({url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheFirst\n\t\t\t\t);";
+      if ("routes" in this._options.cacheFirst) {
+        for (var _i = 0, _a = this._options.cacheFirst.routes; _i < _a.length; _i++) {
+          var route = _a[_i];
+          var routeCode = escodegen_1.generate(toAst(route));
+          code += "registerRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tcacheFirst\n\t\t\t\t\t);";
+        }
+      }
+
+      if ("fileTypes" in this._options.cacheFirst) {
+        var fileTypesCode = escodegen_1.generate(toAst(this._options.cacheFirst.fileTypes));
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheOnly\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += "" + code;
@@ -271,13 +284,20 @@ var GridsomePluginServiceWorker = function () {
   };
 
   GridsomePluginServiceWorker.prototype._addCacheOnlyToServiceWorkerContent = function () {
-    if ("cacheOnly" in this._options && this._options.cacheOnly instanceof Object && this._options.cacheOnly.routes.length > 0) {
+    if ("cacheOnly" in this._options && this._options.cacheOnly instanceof Object && (this._options.cacheOnly.routes.length > 0 || this._options.cacheOnly.fileTypes.length > 0)) {
       var code = "\nconst cacheOnly = new CacheOnly({\n\t\t\t\tcacheName: " + JSON.stringify(this._options.cacheOnly.cacheName) + "\n\t\t\t});";
 
-      for (var _i = 0, _a = this._options.cacheOnly.routes; _i < _a.length; _i++) {
-        var route = _a[_i];
-        var routeCode = escodegen_1.generate(toAst(route));
-        code += "\nregisterRoute(\n\t\t\t\t\t({url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheOnly\n\t\t\t\t);";
+      if ("routes" in this._options.cacheOnly) {
+        for (var _i = 0, _a = this._options.cacheOnly.routes; _i < _a.length; _i++) {
+          var route = _a[_i];
+          var routeCode = escodegen_1.generate(toAst(route));
+          code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tcacheOnly\n\t\t\t\t\t);";
+        }
+      }
+
+      if ("fileTypes" in this._options.cacheOnly) {
+        var fileTypesCode = escodegen_1.generate(toAst(this._options.cacheOnly.fileTypes));
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheOnly\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += code;
@@ -285,13 +305,20 @@ var GridsomePluginServiceWorker = function () {
   };
 
   GridsomePluginServiceWorker.prototype._addNetworkFirstToServiceWorkerContent = function () {
-    if ("networkFirst" in this._options && this._options.networkFirst instanceof Object && this._options.networkFirst.routes.length > 0) {
+    if ("networkFirst" in this._options && this._options.networkFirst instanceof Object && (this._options.networkFirst.routes.length > 0 || this._options.networkFirst.fileTypes.length > 0)) {
       var code = "\n\t\t\t\t\t  const networkFirst = new NetworkFirst({\n\t\t\t\tcacheName: " + JSON.stringify(this._options.networkFirst.cacheName) + "\n\t\t\t});";
 
-      for (var _i = 0, _a = this._options.networkFirst.routes; _i < _a.length; _i++) {
-        var route = _a[_i];
-        var routeCode = escodegen_1.generate(toAst(route));
-        code += "registerRoute(\n\t\t\t\t\t({url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tnetworkFirst\n\t\t\t\t);";
+      if ("routes" in this._options.networkFirst) {
+        for (var _i = 0, _a = this._options.networkFirst.routes; _i < _a.length; _i++) {
+          var route = _a[_i];
+          var routeCode = escodegen_1.generate(toAst(route));
+          code += "registerRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tnetworkFirst\n\t\t\t\t\t);";
+        }
+      }
+
+      if ("fileTypes" in this._options.networkFirst) {
+        var fileTypesCode = escodegen_1.generate(toAst(this._options.networkFirst.fileTypes));
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tnetworkFirst\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += "" + code;
@@ -299,13 +326,20 @@ var GridsomePluginServiceWorker = function () {
   };
 
   GridsomePluginServiceWorker.prototype._addNetworkOnlyToServiceWorkerContent = function () {
-    if ("networkOnly" in this._options && this._options.networkOnly instanceof Object && this._options.networkOnly.routes.length > 0) {
+    if ("networkOnly" in this._options && this._options.networkOnly instanceof Object && (this._options.networkOnly.routes.length > 0 || this._options.networkOnly.fileTypes.length > 0)) {
       var code = "\nconst networkOnly = new NetworkOnly({\n\t\t\t\tcacheName: " + JSON.stringify(this._options.networkOnly.cacheName) + "\n\t\t\t});";
 
-      for (var _i = 0, _a = this._options.networkOnly.routes; _i < _a.length; _i++) {
-        var route = _a[_i];
-        var routeCode = escodegen_1.generate(toAst(route));
-        code += "\nregisterRoute(\n\t\t\t\t\t({url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tnetworkOnly\n\t\t\t\t);";
+      if ("routes" in this._options.networkOnly) {
+        for (var _i = 0, _a = this._options.networkOnly.routes; _i < _a.length; _i++) {
+          var route = _a[_i];
+          var routeCode = escodegen_1.generate(toAst(route));
+          code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tnetworkOnly\n\t\t\t\t\t);";
+        }
+      }
+
+      if ("fileTypes" in this._options.networkOnly) {
+        var fileTypesCode = escodegen_1.generate(toAst(this._options.networkOnly.fileTypes));
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tnetworkOnly\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += code;
@@ -313,13 +347,20 @@ var GridsomePluginServiceWorker = function () {
   };
 
   GridsomePluginServiceWorker.prototype._addStaleWhileRevalidateToServiceWorkerContent = function () {
-    if ("staleWhileRevalidate" in this._options && this._options.staleWhileRevalidate instanceof Object && this._options.staleWhileRevalidate.routes.length > 0) {
+    if ("staleWhileRevalidate" in this._options && this._options.staleWhileRevalidate instanceof Object && (this._options.staleWhileRevalidate.routes.length > 0 || this._options.staleWhileRevalidate.fileTypes.length > 0)) {
       var code = "\nconst staleWhileRevalidate = new StaleWhileRevalidate({\n\t\t\t\tcacheName: " + JSON.stringify(this._options.staleWhileRevalidate.cacheName) + "\n\t\t\t});";
 
-      for (var _i = 0, _a = this._options.staleWhileRevalidate.routes; _i < _a.length; _i++) {
-        var route = _a[_i];
-        var routeCode = escodegen_1.generate(toAst(route));
-        code += "\nregisterRoute(\n\t\t\t\t\t({url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tstaleWhileRevalidate\n\t\t\t\t);";
+      if ("routes" in this._options.staleWhileRevalidate) {
+        for (var _i = 0, _a = this._options.staleWhileRevalidate.routes; _i < _a.length; _i++) {
+          var route = _a[_i];
+          var routeCode = escodegen_1.generate(toAst(route));
+          code += "\nregisterRoute(\n\t\t\t\t\t\t({url}) => {\n\t\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t} else if (typeof " + routeCode + " === \"string\") {\n\t\t\t\t\t\t\t\treturn url.pathname === " + routeCode + ";\n\t\t\t\t\t\t\t} else if (" + routeCode + " instanceof RegExp) {\n\t\t\t\t\t\t\t\treturn " + routeCode + ".test(url.pathname);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tstaleWhileRevalidate\n\t\t\t\t\t);";
+        }
+      }
+
+      if ("fileTypes" in this._options.staleWhileRevalidate) {
+        var fileTypesCode = escodegen_1.generate(toAst(this._options.staleWhileRevalidate.fileTypes));
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tstaleWhileRevalidate\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += code;
@@ -338,10 +379,11 @@ var GridsomePluginServiceWorker = function () {
           case 0:
             return [4, rollup_1.rollup({
               input: "./static/service-worker.temp.js",
-              plugins: [nodeResolve(), commonjs(), babel({
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
-                runtimeHelpers: true
+                babelHelpers: "runtime",
+                skipPreflightCheck: true
               }), replace({
                 "process.env.NODE_ENV": JSON.stringify("production")
               }), rollup_plugin_terser_1.terser()]
@@ -392,23 +434,44 @@ var GridsomePluginServiceWorker = function () {
         throw new TypeError("\"" + optionName + ".cacheName\" must be present");
       }
 
-      if (!("routes" in strategy)) {
-        throw new TypeError("\"" + optionName + ".routes\" must be present");
+      if (!("routes" in strategy) && !("fileTypes" in strategy)) {
+        throw new TypeError("\"" + optionName + ".routes\" or \"" + optionName + ".fileTypes\" must be present");
       }
 
       if (typeof strategy.cacheName !== "string") {
         throw new TypeError("\"" + optionName + ".cacheName\" must be a string");
       }
 
-      if (!Array.isArray(strategy.routes)) {
-        throw new TypeError("\"" + optionName + ".routes\" must be an array");
+      if ("routes" in strategy) {
+        if (!Array.isArray(strategy.routes)) {
+          throw new TypeError("\"" + optionName + ".routes\" must be an array");
+        }
+
+        for (var index = 0; index < strategy.routes.length; index++) {
+          var route = strategy.routes[index];
+
+          if (typeof route !== "string" && !(route instanceof RegExp)) {
+            throw new TypeError("\"" + optionName + ".routes[" + index + "]\" must be a string or a regexp");
+          }
+        }
       }
 
-      for (var index = 0; index < strategy.routes.length; index++) {
-        var route = strategy.routes[index];
+      if ("fileTypes" in strategy) {
+        if (!Array.isArray(strategy.fileTypes)) {
+          throw new TypeError("\"" + optionName + ".fileTypes\" must be an array");
+        }
 
-        if (typeof route !== "string" && !(route instanceof RegExp)) {
-          throw new TypeError("\"" + optionName + ".routes[" + index + "]\" must be a string or a regexp");
+        for (var index = 0; index < strategy.fileTypes.length; index++) {
+          var fileType = strategy.fileTypes[index];
+
+          if (typeof fileType !== "string") {
+            throw new TypeError("\"" + optionName + ".fileTypes[" + index + "]\" must be a string");
+          }
+
+          if (!this.ALLOWED_REQUEST_DESTINATION.includes(fileType)) {
+            var allowedFileTypes = this.ALLOWED_REQUEST_DESTINATION.join(", ");
+            throw new TypeError("\"" + optionName + "\".fileTypes[" + index + "] must be a valid file type between " + allowedFileTypes);
+          }
         }
       }
     }

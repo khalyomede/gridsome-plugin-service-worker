@@ -1,13 +1,11 @@
+import babel from "@rollup/plugin-babel";
 import * as commonjs from "@rollup/plugin-commonjs";
-import * as nodeResolve from "@rollup/plugin-node-resolve";
+import nodeResolve from "@rollup/plugin-node-resolve";
 import * as replace from "@rollup/plugin-replace";
 import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { copy } from "fs-extra";
 import { rollup } from "rollup";
-// @ts-ignore
-// Ignoring because there is no type package for it.
-import * as babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
 // @ts-ignore
 // Ignoring because there is no type package for it.
@@ -18,6 +16,26 @@ import IOptions from "./IOptions";
 class GridsomePluginServiceWorker {
 	private readonly _options: IOptions;
 	private _serviceWorkerContent: string;
+	public readonly ALLOWED_REQUEST_DESTINATION = [
+		"audio",
+		"audioworklet",
+		"document",
+		"embed",
+		"font",
+		"image",
+		"manifest",
+		"object",
+		"paintworklet",
+		"report",
+		"script",
+		"serviceworker",
+		"sharedworker",
+		"style",
+		"track",
+		"video",
+		"worker",
+		"xslt",
+	];
 
 	public constructor(api: IApi, options: IOptions) {
 		this._options = options;
@@ -70,23 +88,28 @@ class GridsomePluginServiceWorker {
 			cacheFirst: {
 				cacheName: "cf-v1",
 				routes: [],
+				fileTypes: [],
 			},
 			cacheOnly: {
 				cacheName: "co-v1",
 				routes: [],
+				fileTypes: [],
 			},
 			networkFirst: {
 				cacheName: "nf-v1",
 				routes: [],
+				fileTypes: [],
 			},
 			networkOnly: {
 				cacheName: "no-v1",
 				routes: [],
+				fileTypes: [],
 			},
 			precachedRoutes: [],
 			staleWhileRevalidate: {
 				cacheName: "swr-v1",
 				routes: [],
+				fileTypes: [],
 			},
 		};
 	}
@@ -114,29 +137,49 @@ class GridsomePluginServiceWorker {
 		if (
 			"cacheFirst" in this._options &&
 			this._options.cacheFirst instanceof Object &&
-			this._options.cacheFirst.routes.length > 0
+			(this._options.cacheFirst.routes.length > 0 ||
+				this._options.cacheFirst.fileTypes.length > 0)
 		) {
 			let code = `
 			const cacheFirst = new CacheFirst({
 				cacheName: ${JSON.stringify(this._options.cacheFirst.cacheName)}
 			});`;
 
-			for (const route of this._options.cacheFirst.routes) {
-				const routeCode = generate(toAst(route));
+			if ("routes" in this._options.cacheFirst) {
+				for (const route of this._options.cacheFirst.routes) {
+					const routeCode = generate(toAst(route));
 
-				code += `registerRoute(
-					({url}) => {
+					code += `registerRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						cacheFirst
+					);`;
+				}
+			}
+
+			if ("fileTypes" in this._options.cacheFirst) {
+				const fileTypesCode = generate(
+					toAst(this._options.cacheFirst.fileTypes)
+				);
+
+				code += `\nregisterRoute(
+					({request, url}) => {
 						if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
 							return false;
-						} else if (typeof ${routeCode} === "string") {
-							return url.pathname === ${routeCode};
-						} else if (${routeCode} instanceof RegExp) {
-							return ${routeCode}.test(url.pathname);
 						} else {
-							return false;
+							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
-					cacheFirst
+					cacheOnly
 				);`;
 			}
 
@@ -148,25 +191,45 @@ class GridsomePluginServiceWorker {
 		if (
 			"cacheOnly" in this._options &&
 			this._options.cacheOnly instanceof Object &&
-			this._options.cacheOnly.routes.length > 0
+			(this._options.cacheOnly.routes.length > 0 ||
+				this._options.cacheOnly.fileTypes.length > 0)
 		) {
 			let code = `\nconst cacheOnly = new CacheOnly({
 				cacheName: ${JSON.stringify(this._options.cacheOnly.cacheName)}
 			});`;
 
-			for (const route of this._options.cacheOnly.routes) {
-				const routeCode = generate(toAst(route));
+			if ("routes" in this._options.cacheOnly) {
+				for (const route of this._options.cacheOnly.routes) {
+					const routeCode = generate(toAst(route));
+
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						cacheOnly
+					);`;
+				}
+			}
+
+			if ("fileTypes" in this._options.cacheOnly) {
+				const fileTypesCode = generate(
+					toAst(this._options.cacheOnly.fileTypes)
+				);
 
 				code += `\nregisterRoute(
-					({url}) => {
+					({request, url}) => {
 						if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
 							return false;
-						} else if (typeof ${routeCode} === "string") {
-							return url.pathname === ${routeCode};
-						} else if (${routeCode} instanceof RegExp) {
-							return ${routeCode}.test(url.pathname);
 						} else {
-							return false;
+							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
 					cacheOnly
@@ -181,26 +244,46 @@ class GridsomePluginServiceWorker {
 		if (
 			"networkFirst" in this._options &&
 			this._options.networkFirst instanceof Object &&
-			this._options.networkFirst.routes.length > 0
+			(this._options.networkFirst.routes.length > 0 ||
+				this._options.networkFirst.fileTypes.length > 0)
 		) {
 			let code = `
 					  const networkFirst = new NetworkFirst({
 				cacheName: ${JSON.stringify(this._options.networkFirst.cacheName)}
 			});`;
 
-			for (const route of this._options.networkFirst.routes) {
-				const routeCode = generate(toAst(route));
+			if ("routes" in this._options.networkFirst) {
+				for (const route of this._options.networkFirst.routes) {
+					const routeCode = generate(toAst(route));
 
-				code += `registerRoute(
-					({url}) => {
+					code += `registerRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						networkFirst
+					);`;
+				}
+			}
+
+			if ("fileTypes" in this._options.networkFirst) {
+				const fileTypesCode = generate(
+					toAst(this._options.networkFirst.fileTypes)
+				);
+
+				code += `\nregisterRoute(
+					({request, url}) => {
 						if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
 							return false;
-						} else if (typeof ${routeCode} === "string") {
-							return url.pathname === ${routeCode};
-						} else if (${routeCode} instanceof RegExp) {
-							return ${routeCode}.test(url.pathname);
 						} else {
-							return false;
+							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
 					networkFirst
@@ -215,25 +298,45 @@ class GridsomePluginServiceWorker {
 		if (
 			"networkOnly" in this._options &&
 			this._options.networkOnly instanceof Object &&
-			this._options.networkOnly.routes.length > 0
+			(this._options.networkOnly.routes.length > 0 ||
+				this._options.networkOnly.fileTypes.length > 0)
 		) {
 			let code = `\nconst networkOnly = new NetworkOnly({
 				cacheName: ${JSON.stringify(this._options.networkOnly.cacheName)}
 			});`;
 
-			for (const route of this._options.networkOnly.routes) {
-				const routeCode = generate(toAst(route));
+			if ("routes" in this._options.networkOnly) {
+				for (const route of this._options.networkOnly.routes) {
+					const routeCode = generate(toAst(route));
+
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						networkOnly
+					);`;
+				}
+			}
+
+			if ("fileTypes" in this._options.networkOnly) {
+				const fileTypesCode = generate(
+					toAst(this._options.networkOnly.fileTypes)
+				);
 
 				code += `\nregisterRoute(
-					({url}) => {
+					({request, url}) => {
 						if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
 							return false;
-						} else if (typeof ${routeCode} === "string") {
-							return url.pathname === ${routeCode};
-						} else if (${routeCode} instanceof RegExp) {
-							return ${routeCode}.test(url.pathname);
 						} else {
-							return false;
+							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
 					networkOnly
@@ -248,25 +351,45 @@ class GridsomePluginServiceWorker {
 		if (
 			"staleWhileRevalidate" in this._options &&
 			this._options.staleWhileRevalidate instanceof Object &&
-			this._options.staleWhileRevalidate.routes.length > 0
+			(this._options.staleWhileRevalidate.routes.length > 0 ||
+				this._options.staleWhileRevalidate.fileTypes.length > 0)
 		) {
 			let code = `\nconst staleWhileRevalidate = new StaleWhileRevalidate({
 				cacheName: ${JSON.stringify(this._options.staleWhileRevalidate.cacheName)}
 			});`;
 
-			for (const route of this._options.staleWhileRevalidate.routes) {
-				const routeCode = generate(toAst(route));
+			if ("routes" in this._options.staleWhileRevalidate) {
+				for (const route of this._options.staleWhileRevalidate.routes) {
+					const routeCode = generate(toAst(route));
+
+					code += `\nregisterRoute(
+						({url}) => {
+							if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
+								return false;
+							} else if (typeof ${routeCode} === "string") {
+								return url.pathname === ${routeCode};
+							} else if (${routeCode} instanceof RegExp) {
+								return ${routeCode}.test(url.pathname);
+							} else {
+								return false;
+							}
+						},
+						staleWhileRevalidate
+					);`;
+				}
+			}
+
+			if ("fileTypes" in this._options.staleWhileRevalidate) {
+				const fileTypesCode = generate(
+					toAst(this._options.staleWhileRevalidate.fileTypes)
+				);
 
 				code += `\nregisterRoute(
-					({url}) => {
+					({request, url}) => {
 						if (url.pathname === "/assets/js/service-worker.js" || url.pathname === "/service-worker.js") {
 							return false;
-						} else if (typeof ${routeCode} === "string") {
-							return url.pathname === ${routeCode};
-						} else if (${routeCode} instanceof RegExp) {
-							return ${routeCode}.test(url.pathname);
 						} else {
-							return false;
+							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
 					staleWhileRevalidate
@@ -301,7 +424,8 @@ class GridsomePluginServiceWorker {
 				babel({
 					exclude: "node_modules/**",
 					presets: ["@babel/preset-env"],
-					runtimeHelpers: true,
+					babelHelpers: "runtime",
+					skipPreflightCheck: true,
 				}),
 				/**
 				 * @fixme wrong call signature according to TS
@@ -352,8 +476,10 @@ class GridsomePluginServiceWorker {
 				);
 			}
 
-			if (!("routes" in strategy)) {
-				throw new TypeError(`"${optionName}.routes" must be present`);
+			if (!("routes" in strategy) && !("fileTypes" in strategy)) {
+				throw new TypeError(
+					`"${optionName}.routes" or "${optionName}.fileTypes" must be present`
+				);
 			}
 
 			if (typeof strategy.cacheName !== "string") {
@@ -362,17 +488,56 @@ class GridsomePluginServiceWorker {
 				);
 			}
 
-			if (!Array.isArray(strategy.routes)) {
-				throw new TypeError(`"${optionName}.routes" must be an array`);
+			if ("routes" in strategy) {
+				if (!Array.isArray(strategy.routes)) {
+					throw new TypeError(
+						`"${optionName}.routes" must be an array`
+					);
+				}
+
+				for (let index = 0; index < strategy.routes.length; index++) {
+					const route = strategy.routes[index];
+
+					if (
+						typeof route !== "string" &&
+						!(route instanceof RegExp)
+					) {
+						throw new TypeError(
+							`"${optionName}.routes[${index}]" must be a string or a regexp`
+						);
+					}
+				}
 			}
 
-			for (let index = 0; index < strategy.routes.length; index++) {
-				const route = strategy.routes[index];
-
-				if (typeof route !== "string" && !(route instanceof RegExp)) {
+			if ("fileTypes" in strategy) {
+				if (!Array.isArray(strategy.fileTypes)) {
 					throw new TypeError(
-						`"${optionName}.routes[${index}]" must be a string or a regexp`
+						`"${optionName}.fileTypes" must be an array`
 					);
+				}
+
+				for (
+					let index = 0;
+					index < strategy.fileTypes.length;
+					index++
+				) {
+					const fileType = strategy.fileTypes[index];
+
+					if (typeof fileType !== "string") {
+						throw new TypeError(
+							`"${optionName}.fileTypes[${index}]" must be a string`
+						);
+					}
+
+					if (!this.ALLOWED_REQUEST_DESTINATION.includes(fileType)) {
+						const allowedFileTypes = this.ALLOWED_REQUEST_DESTINATION.join(
+							", "
+						);
+
+						throw new TypeError(
+							`"${optionName}".fileTypes[${index}] must be a valid file type between ${allowedFileTypes}`
+						);
+					}
 				}
 			}
 		}

@@ -32,6 +32,7 @@ I wanted to have a drop-in way to tell which routes to capture and for each, to 
   - Cache-first
   - Cache-only
   - Stale while revalidate
+- Let you chose, for each strategies, to cache files by their types (html, scripts, styles, ...)
 - Let you choose which route to cache ahead, a.k.a. precaching (very powerful with Cache-only)
 
 ## Requirements
@@ -79,10 +80,8 @@ module.exports = {
       use: "gridsome-plugin-service-worker",
       options: {
         networkFirst: {
-          routes: [
-            "/",
-            /\.(js|css|png)$/, // means "every JS, CSS, and PNG images"
-          ],
+          routes: ["/", "/about"],
+          fileTypes: ["image", "script", "style", "image"],
         },
       },
     },
@@ -140,6 +139,7 @@ The [browsers now are configured to check every 24h at most for service worker c
 
 - [1. Use a Network-First strategy](#1-use-a-network-first-strategy)
 - [2. Cache resources ahead of time for offline browsing](#2-cache-resources-ahead-of-time-for-offline-browsing)
+- [3. Caching file types instead of routes](#3-caching-file-types-instead-of-routes)
 
 ### 1. Use a Network-First strategy
 
@@ -180,6 +180,34 @@ module.exports = {
 };
 ```
 
+### 3. Caching file types instead of routes
+
+```javascript
+// gridsome.config.js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-service-worker",
+      options: {
+        networkFirst: {
+          cacheName: "nf-v1",
+          fileTypes: [
+            "document", // includes HTML files
+            "image",
+            "script",
+            "style",
+          ],
+        },
+      },
+    },
+  ],
+};
+```
+
+_You can mix file types and routes if you need._
+
+For a list of available fileTypes, check the Mozilla Developer Network documentation on [Service worker request destinations](https://developer.mozilla.org/en-US/docs/Web/API/RequestDestination#Values).
+
 ## API
 
 _You will find the prototype of the `Strategy` type below._
@@ -196,7 +224,31 @@ _You will find the prototype of the `Strategy` type below._
 interface Strategy {
   cacheName: string;
   routes: Array<String | RegExp>;
+  fileTypes: Array<RequestDestination>;
 }
+```
+
+```typescript
+type RequestDestination =
+  | ""
+  | "audio"
+  | "audioworklet"
+  | "document"
+  | "embed"
+  | "font"
+  | "image"
+  | "manifest"
+  | "object"
+  | "paintworklet"
+  | "report"
+  | "script"
+  | "serviceworker"
+  | "sharedworker"
+  | "style"
+  | "track"
+  | "video"
+  | "worker"
+  | "xslt";
 ```
 
 ## Run the tests
