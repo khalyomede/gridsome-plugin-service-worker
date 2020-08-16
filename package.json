@@ -43,7 +43,6 @@
 	"files": [
 		"gridsome.server.js",
 		"gridsome.client.js",
-		"register-service-worker.js",
 		"service-worker.js"
 	],
 	"dependencies": {

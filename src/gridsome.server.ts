@@ -4,7 +4,6 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import * as replace from "@rollup/plugin-replace";
 import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
-import { copy } from "fs-extra";
 import { rollup } from "rollup";
 import { terser } from "rollup-plugin-terser";
 // @ts-ignore
@@ -16,6 +15,7 @@ import IOptions from "./IOptions";
 class GridsomePluginServiceWorker {
 	private readonly _options: IOptions;
 	private _serviceWorkerContent: string;
+	private _serviceWorkerRegistrationContent: string;
 	public readonly ALLOWED_REQUEST_DESTINATION = [
 		"audio",
 		"audioworklet",
@@ -40,6 +40,7 @@ class GridsomePluginServiceWorker {
 	public constructor(api: IApi, options: IOptions) {
 		this._options = options;
 		this._serviceWorkerContent = "";
+		this._serviceWorkerRegistrationContent = "";
 
 		api.beforeBuild(async () => {
 			/* tslint:disable:no-console */
@@ -71,10 +72,12 @@ class GridsomePluginServiceWorker {
 			this._addNetworkOnlyToServiceWorkerContent();
 			this._addStaleWhileRevalidateToServiceWorkerContent();
 			this._saveTemporaryServiceWorkerContent();
+			this._setServiceWorkerRegistrationContent();
+			this._saveTemporaryServiceWorkerRegistrationContent();
 
 			await Promise.all([
 				GridsomePluginServiceWorker._transpileAndSaveServiceWorker(),
-				GridsomePluginServiceWorker._copyAndSaveServiceWorkerRegistration(),
+				GridsomePluginServiceWorker._transpileAndSaveServiceWorkerRegistration(),
 			]);
 
 			/* tslint:disable:no-console */
@@ -112,6 +115,31 @@ class GridsomePluginServiceWorker {
 				fileTypes: [],
 			},
 		};
+	}
+
+	private _setServiceWorkerRegistrationContent(): void {
+		// @ts-ignore
+		// Ignoring because it will be available when used in a project
+		const pathPrefix = process?.GRIDSOME?.config?.pathPrefix ?? "/";
+		const scope = generate(toAst(pathPrefix));
+		this._serviceWorkerRegistrationContent = `
+			import { Workbox } from "workbox-window";
+
+			if ("serviceWorker" in navigator) {
+				const workbox = new Workbox("/service-worker.js", {
+					scope: ${scope},
+				});
+
+				(async () => await workbox.register())();
+			}
+		`;
+	}
+
+	private _saveTemporaryServiceWorkerRegistrationContent(): void {
+		writeFileSync(
+			"./static/register-service-worker.temp.js",
+			this._serviceWorkerRegistrationContent
+		);
 	}
 
 	private _setInitialServiceWorkerContent(): void {
@@ -446,13 +474,45 @@ class GridsomePluginServiceWorker {
 		unlinkSync("./static/service-worker.temp.js");
 	}
 
-	private static async _copyAndSaveServiceWorkerRegistration(): Promise<
+	private static async _transpileAndSaveServiceWorkerRegistration(): Promise<
 		void
 	> {
-		await copy(
-			`${__dirname}/register-service-worker.js`,
-			"./static/assets/js/service-worker.js"
-		);
+		const serviceWorkerRegistrationBundle = await rollup({
+			input: "./static/register-service-worker.temp.js",
+			plugins: [
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
+				nodeResolve(),
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
+				commonjs(),
+				babel({
+					exclude: "node_modules/**",
+					presets: ["@babel/preset-env"],
+					babelHelpers: "runtime",
+					skipPreflightCheck: true,
+				}),
+				/**
+				 * @fixme wrong call signature according to TS
+				 */
+				// @ts-ignore
+				replace({
+					"process.env.NODE_ENV": JSON.stringify("production"),
+				}),
+				terser(),
+			],
+		});
+
+		await serviceWorkerRegistrationBundle.write({
+			format: "iife",
+			file: "./static/assets/js/service-worker.js",
+		});
+
+		unlinkSync("./static/register-service-worker.temp.js");
 	}
 
 	private _throwIfOptionIsNotAStrategy(

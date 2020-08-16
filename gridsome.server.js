@@ -155,8 +155,6 @@ var escodegen_1 = require("escodegen");
 
 var fs_1 = require("fs");
 
-var fs_extra_1 = require("fs-extra");
-
 var rollup_1 = require("rollup");
 
 var rollup_plugin_terser_1 = require("rollup-plugin-terser");
@@ -170,6 +168,7 @@ var GridsomePluginServiceWorker = function () {
     this.ALLOWED_REQUEST_DESTINATION = ["audio", "audioworklet", "document", "embed", "font", "image", "manifest", "object", "paintworklet", "report", "script", "serviceworker", "sharedworker", "style", "track", "video", "worker", "xslt"];
     this._options = options;
     this._serviceWorkerContent = "";
+    this._serviceWorkerRegistrationContent = "";
     api.beforeBuild(function () {
       return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -206,7 +205,11 @@ var GridsomePluginServiceWorker = function () {
 
               this._saveTemporaryServiceWorkerContent();
 
-              return [4, Promise.all([GridsomePluginServiceWorker._transpileAndSaveServiceWorker(), GridsomePluginServiceWorker._copyAndSaveServiceWorkerRegistration()])];
+              this._setServiceWorkerRegistrationContent();
+
+              this._saveTemporaryServiceWorkerRegistrationContent();
+
+              return [4, Promise.all([GridsomePluginServiceWorker._transpileAndSaveServiceWorker(), GridsomePluginServiceWorker._transpileAndSaveServiceWorkerRegistration()])];
 
             case 1:
               _a.sent();
@@ -248,6 +251,18 @@ var GridsomePluginServiceWorker = function () {
         fileTypes: []
       }
     };
+  };
+
+  GridsomePluginServiceWorker.prototype._setServiceWorkerRegistrationContent = function () {
+    var _a, _b, _c;
+
+    var pathPrefix = (_c = (_b = (_a = process === null || process === void 0 ? void 0 : process.GRIDSOME) === null || _a === void 0 ? void 0 : _a.config) === null || _b === void 0 ? void 0 : _b.pathPrefix) !== null && _c !== void 0 ? _c : "/";
+    var scope = escodegen_1.generate(toAst(pathPrefix));
+    this._serviceWorkerRegistrationContent = "\n\t\t\timport { Workbox } from \"workbox-window\";\n\n\t\t\tif (\"serviceWorker\" in navigator) {\n\t\t\t\tconst workbox = new Workbox(\"/service-worker.js\", {\n\t\t\t\t\tscope: " + scope + ",\n\t\t\t\t});\n\n\t\t\t\t(async () => await workbox.register())();\n\t\t\t}\n\t\t";
+  };
+
+  GridsomePluginServiceWorker.prototype._saveTemporaryServiceWorkerRegistrationContent = function () {
+    fs_1.writeFileSync("./static/register-service-worker.temp.js", this._serviceWorkerRegistrationContent);
   };
 
   GridsomePluginServiceWorker.prototype._setInitialServiceWorkerContent = function () {
@@ -406,16 +421,35 @@ var GridsomePluginServiceWorker = function () {
     });
   };
 
-  GridsomePluginServiceWorker._copyAndSaveServiceWorkerRegistration = function () {
+  GridsomePluginServiceWorker._transpileAndSaveServiceWorkerRegistration = function () {
     return __awaiter(this, void 0, void 0, function () {
+      var serviceWorkerRegistrationBundle;
       return __generator(this, function (_a) {
         switch (_a.label) {
           case 0:
-            return [4, fs_extra_1.copy(__dirname + "/register-service-worker.js", "./static/assets/js/service-worker.js")];
+            return [4, rollup_1.rollup({
+              input: "./static/register-service-worker.temp.js",
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
+                exclude: "node_modules/**",
+                presets: ["@babel/preset-env"],
+                babelHelpers: "runtime",
+                skipPreflightCheck: true
+              }), replace({
+                "process.env.NODE_ENV": JSON.stringify("production")
+              }), rollup_plugin_terser_1.terser()]
+            })];
 
           case 1:
+            serviceWorkerRegistrationBundle = _a.sent();
+            return [4, serviceWorkerRegistrationBundle.write({
+              format: "iife",
+              file: "./static/assets/js/service-worker.js"
+            })];
+
+          case 2:
             _a.sent();
 
+            fs_1.unlinkSync("./static/register-service-worker.temp.js");
             return [2];
         }
       });
