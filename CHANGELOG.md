@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] 2020-08-17
+
+### Fixed
+
+- Bug when the service worker would produce a error instead of working correctly.
+
 ## [0.2.3] 2020-08-16
 
 ### Fixed

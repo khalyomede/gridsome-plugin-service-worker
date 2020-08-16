@@ -143,8 +143,6 @@ var __generator = void 0 && (void 0).__generator || function (thisArg, body) {
   }
 };
 
-var plugin_babel_1 = require("@rollup/plugin-babel");
-
 var commonjs = require("@rollup/plugin-commonjs");
 
 var plugin_node_resolve_1 = require("@rollup/plugin-node-resolve");
@@ -156,6 +154,8 @@ var escodegen_1 = require("escodegen");
 var fs_1 = require("fs");
 
 var rollup_1 = require("rollup");
+
+var babel = require("rollup-plugin-babel");
 
 var rollup_plugin_terser_1 = require("rollup-plugin-terser");
 
@@ -401,11 +401,13 @@ var GridsomePluginServiceWorker = function () {
           case 0:
             return [4, rollup_1.rollup({
               input: "./static/service-worker.temp.js",
-              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
-                babelHelpers: "runtime",
-                skipPreflightCheck: true
+                plugins: [["@babel/plugin-transform-runtime", {
+                  regenerator: true
+                }]],
+                runtimeHelpers: true
               }), replace({
                 "process.env.NODE_ENV": JSON.stringify("production")
               }), rollup_plugin_terser_1.terser()]
@@ -436,11 +438,13 @@ var GridsomePluginServiceWorker = function () {
           case 0:
             return [4, rollup_1.rollup({
               input: "./static/register-service-worker.temp.js",
-              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
-                babelHelpers: "runtime",
-                skipPreflightCheck: true
+                plugins: [["@babel/plugin-transform-runtime", {
+                  regenerator: true
+                }]],
+                runtimeHelpers: true
               }), replace({
                 "process.env.NODE_ENV": JSON.stringify("production")
               }), rollup_plugin_terser_1.terser()]

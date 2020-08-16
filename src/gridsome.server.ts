@@ -1,10 +1,11 @@
-import babel from "@rollup/plugin-babel";
 import * as commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import * as replace from "@rollup/plugin-replace";
 import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { rollup } from "rollup";
+// @ts-ignore
+import * as babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
 // @ts-ignore
 // Ignoring because there is no type package for it.
@@ -462,8 +463,13 @@ class GridsomePluginServiceWorker {
 				babel({
 					exclude: "node_modules/**",
 					presets: ["@babel/preset-env"],
-					babelHelpers: "runtime",
-					skipPreflightCheck: true,
+					plugins: [
+						[
+							"@babel/plugin-transform-runtime",
+							{ regenerator: true },
+						],
+					],
+					runtimeHelpers: true,
 				}),
 				/**
 				 * @fixme wrong call signature according to TS
@@ -503,8 +509,13 @@ class GridsomePluginServiceWorker {
 				babel({
 					exclude: "node_modules/**",
 					presets: ["@babel/preset-env"],
-					babelHelpers: "runtime",
-					skipPreflightCheck: true,
+					plugins: [
+						[
+							"@babel/plugin-transform-runtime",
+							{ regenerator: true },
+						],
+					],
+					runtimeHelpers: true,
 				}),
 				/**
 				 * @fixme wrong call signature according to TS
