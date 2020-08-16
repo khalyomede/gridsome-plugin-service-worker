@@ -28,7 +28,7 @@ describe("server", () => {
 			expect(GridsomeServer).to.be.an.instanceOf(Function));
 
 		it("should generate a service-worker.js file in the static folder", async function () {
-			this.timeout(10000);
+			this.timeout(15000);
 
 			new GridsomeServer(api, {
 				networkFirst: {
@@ -37,7 +37,7 @@ describe("server", () => {
 				},
 			});
 
-			await sleep(9000);
+			await sleep(12000);
 
 			expect(existsSync("static/service-worker.js")).to.be.true;
 			expect(existsSync("static/assets/js/service-worker.js")).to.be.true;
