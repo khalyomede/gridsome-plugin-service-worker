@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.7] 2021-04-29
+
+### Fixed
+
+- Files configured to use the CacheOnly strategy will no longer we using the CacheFirst strategy (thanks a lot for spotting this bug [@JoeTodes](https://github.com/JoeTodes)!)
+
 ## [0.2.6] 2020-08-18
 
 ### Fixed
