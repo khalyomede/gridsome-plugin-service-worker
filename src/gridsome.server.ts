@@ -221,7 +221,7 @@ class GridsomePluginServiceWorker {
 							return ${fileTypesCode}.includes(request.destination);
 						}
 					},
-					cacheOnly
+					cacheFirst
 				);`;
 			}
 
