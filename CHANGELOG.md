@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] 2021-04-29
+
+### Fixed
+
+- The patch from [v0.2.7](#0-2-7-2021-04-29) will now be active (thanks again [@JoeTodes](https://github.com/JoeTodes) ❤️)
+- Some dependencies have been updated
+- Fixed dependencies version for increased safety
+
 ## [0.2.7] 2021-04-29
 
 ### Fixed
