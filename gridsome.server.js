@@ -155,7 +155,7 @@ var fs_1 = require("fs");
 
 var rollup_1 = require("rollup");
 
-var babel = require("rollup-plugin-babel");
+var plugin_babel_1 = require("@rollup/plugin-babel");
 
 var rollup_plugin_terser_1 = require("rollup-plugin-terser");
 
@@ -406,15 +406,16 @@ var GridsomePluginServiceWorker = function () {
           case 0:
             return [4, rollup_1.rollup({
               input: "./static/service-worker.temp.js",
-              plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
                 plugins: [["@babel/plugin-transform-runtime", {
                   regenerator: true
                 }]],
-                runtimeHelpers: true
+                babelHelpers: "runtime"
               }), replace({
-                "process.env.NODE_ENV": JSON.stringify("production")
+                "process.env.NODE_ENV": JSON.stringify("production"),
+                preventAssignment: false
               }), rollup_plugin_terser_1.terser()]
             })];
 
@@ -443,15 +444,16 @@ var GridsomePluginServiceWorker = function () {
           case 0:
             return [4, rollup_1.rollup({
               input: "./static/register-service-worker.temp.js",
-              plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
+              plugins: [plugin_node_resolve_1["default"](), commonjs(), plugin_babel_1["default"]({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
                 plugins: [["@babel/plugin-transform-runtime", {
                   regenerator: true
                 }]],
-                runtimeHelpers: true
+                babelHelpers: "runtime"
               }), replace({
-                "process.env.NODE_ENV": JSON.stringify("production")
+                "process.env.NODE_ENV": JSON.stringify("production"),
+                preventAssignment: false
               }), rollup_plugin_terser_1.terser()]
             })];
 

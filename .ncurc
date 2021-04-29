@@ -1,4 +1,4 @@
 {
-	"error-level": 2,
-	"reject": ["@rollup/plugin-typescript"]
+	"errorLevel": 2,
+	"reject": ["@rollup/plugin-typescript", "workbox-*", "typescript"]
 }

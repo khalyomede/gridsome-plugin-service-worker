@@ -1,23 +1,24 @@
-// @ts-ignore
-// Ignoring because this method is called by Gridsome.
-export default (Vue, options, { head }) => {
-	// @ts-ignore
-	// Ignoring because this method is called by Gridsome.
-	if (process.isServer) {
-		const { pathPrefix } = require("../../gridsome.config.js");
-		let src =
-			(pathPrefix ? pathPrefix : "") + "/assets/js/service-worker.js";
+"use strict";
 
-		if (!src.startsWith("/")) {
-			src = `/${src}`;
-		}
+exports.__esModule = true;
 
-		src = src.replace("//", "/");
+exports["default"] = function (Vue, options, _a) {
+  var head = _a.head;
 
-		head.script.push({
-			type: "text/javascript",
-			src,
-			async: true,
-		});
-	}
+  if (process.isServer) {
+    var pathPrefix = require("../../gridsome.config.js").pathPrefix;
+
+    var src = (pathPrefix ? pathPrefix : "") + "/assets/js/service-worker.js";
+
+    if (!src.startsWith("/")) {
+      src = "/" + src;
+    }
+
+    src = src.replace("//", "/");
+    head.script.push({
+      type: "text/javascript",
+      src: src,
+      async: true
+    });
+  }
 };

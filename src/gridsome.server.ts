@@ -5,7 +5,7 @@ import { generate } from "escodegen";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { rollup } from "rollup";
 // @ts-ignore
-import * as babel from "rollup-plugin-babel";
+import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
 // @ts-ignore
 // Ignoring because there is no type package for it.
@@ -472,7 +472,7 @@ class GridsomePluginServiceWorker {
 							{ regenerator: true },
 						],
 					],
-					runtimeHelpers: true,
+					babelHelpers: "runtime",
 				}),
 				/**
 				 * @fixme wrong call signature according to TS
@@ -480,6 +480,7 @@ class GridsomePluginServiceWorker {
 				// @ts-ignore
 				replace({
 					"process.env.NODE_ENV": JSON.stringify("production"),
+					preventAssignment: false,
 				}),
 				terser(),
 			],
@@ -518,7 +519,7 @@ class GridsomePluginServiceWorker {
 							{ regenerator: true },
 						],
 					],
-					runtimeHelpers: true,
+					babelHelpers: "runtime",
 				}),
 				/**
 				 * @fixme wrong call signature according to TS
@@ -526,6 +527,7 @@ class GridsomePluginServiceWorker {
 				// @ts-ignore
 				replace({
 					"process.env.NODE_ENV": JSON.stringify("production"),
+					preventAssignment: false,
 				}),
 				terser(),
 			],
