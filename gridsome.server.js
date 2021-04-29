@@ -7,7 +7,7 @@ var __awaiter = void 0 && (void 0).__awaiter || function (thisArg, _arguments, P
     });
   }
 
-  return new (P || (P = Promise))(function (resolve, reject) {
+  return new(P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
         step(generator.next(value));
@@ -34,18 +34,18 @@ var __awaiter = void 0 && (void 0).__awaiter || function (thisArg, _arguments, P
 
 var __generator = void 0 && (void 0).__generator || function (thisArg, body) {
   var _ = {
-    label: 0,
-    sent: function sent() {
-      if (t[0] & 1) throw t[1];
-      return t[1];
+      label: 0,
+      sent: function sent() {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      },
+      trys: [],
+      ops: []
     },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
+    f,
+    y,
+    t,
+    g;
   return g = {
     next: verb(0),
     "throw": verb(1),
@@ -78,7 +78,7 @@ var __generator = void 0 && (void 0).__generator || function (thisArg, body) {
             _.label++;
             return {
               value: op[1],
-              done: false
+                done: false
             };
 
           case 5:
@@ -303,7 +303,7 @@ var GridsomePluginServiceWorker = function () {
 
       if ("fileTypes" in this._options.cacheFirst) {
         var fileTypesCode = escodegen_1.generate(toAst(this._options.cacheFirst.fileTypes));
-        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheOnly\n\t\t\t\t);";
+        code += "\nregisterRoute(\n\t\t\t\t\t({request, url}) => {\n\t\t\t\t\t\tif (url.pathname === \"/assets/js/service-worker.js\" || url.pathname === \"/service-worker.js\") {\n\t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn " + fileTypesCode + ".includes(request.destination);\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tcacheFirst\n\t\t\t\t);";
       }
 
       this._serviceWorkerContent += "" + code;
@@ -409,9 +409,11 @@ var GridsomePluginServiceWorker = function () {
               plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
-                plugins: [["@babel/plugin-transform-runtime", {
-                  regenerator: true
-                }]],
+                plugins: [
+                  ["@babel/plugin-transform-runtime", {
+                    regenerator: true
+                  }]
+                ],
                 runtimeHelpers: true
               }), replace({
                 "process.env.NODE_ENV": JSON.stringify("production")
@@ -446,9 +448,11 @@ var GridsomePluginServiceWorker = function () {
               plugins: [plugin_node_resolve_1["default"](), commonjs(), babel({
                 exclude: "node_modules/**",
                 presets: ["@babel/preset-env"],
-                plugins: [["@babel/plugin-transform-runtime", {
-                  regenerator: true
-                }]],
+                plugins: [
+                  ["@babel/plugin-transform-runtime", {
+                    regenerator: true
+                  }]
+                ],
                 runtimeHelpers: true
               }), replace({
                 "process.env.NODE_ENV": JSON.stringify("production")
